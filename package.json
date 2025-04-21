@@ -1,21 +1,76 @@
 {
-  "name": "typescript-copy-reference",
-  "displayName": "TypeScript Copy Reference",
-  "description": "IntelliJ WebStorm like copy reference functionality, optimised for TypeScript support.",
-  "version": "0.0.1",
+  "name": "saucer",
+  "displayName": "Saucer",
+  "description": "VSCode extension that copies code reference with Git provider source links as Markdown for sharing.",
+  "version": "1.0.0",
+  "icon": "icon.png",
   "engines": {
     "vscode": "^1.99.0"
   },
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onLanguage:typescript",
+    "onLanguage:typescriptreact"
+  ],
   "main": "./out/extension.js",
   "contributes": {
+    "configuration": {
+      "title": "Saucer",
+      "properties": {
+        "saucer.includeRelativePath": {
+          "type": "boolean",
+          "default": true,
+          "description": "References should include relative file path"
+        },
+        "saucer.linkSource": {
+          "type": "boolean",
+          "default": true,
+          "description": "References should link source"
+        },
+        "saucer.cursorReferenceType": {
+          "type": "string",
+          "enum": [
+            "Ask",
+            "Symbol",
+            "Filename"
+          ],
+          "default": "Ask",
+          "description": "When referencing cursor position, use"
+        },
+        "saucer.selectionReferenceType": {
+          "type": "string",
+          "enum": [
+            "Ask",
+            "Symbol",
+            "Filename"
+          ],
+          "default": "Ask",
+          "description": "When referencing a selection, use"
+        }
+      }
+    },
     "commands": [
       {
-        "command": "typescript-copy-reference.helloWorld",
-        "title": "Hello World"
+        "command": "saucer.copy",
+        "title": "Copy Reference"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "saucer.copy",
+          "group": "clipboard",
+          "when": "editorTextFocus"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "saucer.copy",
+        "key": "alt+shift+c",
+        "mac": "alt+shift+c"
       }
     ]
   },
@@ -24,18 +79,26 @@
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
-    "lint": "eslint src",
-    "test": "vscode-test"
+    "lint": "eslint src && knip",
+    "lint:fix": "eslint src --fix && knip --fix",
+    "fmt": "prettier -w .",
+    "test:vscode": "vscode-test",
+    "test:unit": "vitest run unit.test.ts",
+    "test:unit:watch": "vitest watch run unit.test.ts"
   },
   "devDependencies": {
-    "@types/vscode": "^1.99.0",
-    "@types/mocha": "^10.0.10",
     "@types/node": "20.x",
+    "@types/vscode": "^1.99.0",
     "@typescript-eslint/eslint-plugin": "^8.28.0",
     "@typescript-eslint/parser": "^8.28.0",
-    "eslint": "^9.23.0",
-    "typescript": "^5.8.2",
     "@vscode/test-cli": "^0.0.10",
-    "@vscode/test-electron": "^2.4.1"
+    "eslint": "^9.23.0",
+    "knip": "^5.50.5",
+    "prettier": "^3.5.3",
+    "typescript": "^5.8.2",
+    "vitest": "^3.1.1"
+  },
+  "dependencies": {
+    "ts-pattern": "^5.7.0"
   }
 }

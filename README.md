@@ -1,71 +1,105 @@
-# typescript-copy-reference README
+# Saucer
 
-This is the README for your extension "typescript-copy-reference". After writing up a brief description, we recommend including the following sections.
+A VS Code extension that provides IntelliJ WebStorm-like copy reference functionality<sup>1</sup>. Easily copy Markdown style code references with source links for sharing.
+
+1: Tested with TypeScript but should work with other languages where VS Code symbol detection works
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+- Copy symbol references in various formats
+- Automatically include source code links to GitHub, GitLab, Bitbucket, or Azure DevOps
+- Reference format options (symbol, line, defaults to ask)
+- Context menu integration
+- Keyboard shortcuts
 
-For example if there is an image subfolder under your extension project workspace:
+## Usage
 
-\!\[feature X\]\(images/feature-x.png\)
+1. Place your cursor on a TypeScript symbol or select a few lines of code
+2. Right-click and select "Copy Reference" or use the keyboard shortcut (```Alt+Shift+C``` on Windows/Linux, ```Opt+Shift+C``` on macOS)
+3. Choose a reference format when prompted:
+   - **Symbol**: Copies the symbol path; i.e. `Class.method`
+   - **Filename**: Copies the file name with line reference; i.e. `foo.ts:10`
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+The copied reference includes a link to the source code repository when configured and available.
 
-## Requirements
+## Examples
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+### Symbol References
+
+When you place your cursor on a symbol and copy a reference:
+
+```md
+`getSymbol` ([GitHub](https://....))
+```
+
+With relative path enabled:
+
+```md
+`src/utils/symbol.ts:getSymbol` ([GitHub](https://....))
+```
+
+### Line References
+
+When you place your cursor on a specific line:
+
+```md
+`git.ts:42` ([GitLab](https://....))
+```
+
+### Selection References
+
+When you select multiple lines:
+
+```md
+`referenceRange.ts:10-20` ([Bitbucket](https://....))
+```
+
+### Different Git Providers
+
+When source link is enabled (default) appropriate links are generated on your working repository:
+
+- GitHub: `([GitHub](https://github.com/user/repo/blob/[branch]/src/utils/[file]#L[number]))`
+- GitLab: `([GitLab](https://gitlab.com/user/repo/-/blob/[branch]/src/utils/[file]#L[number]))`
+- Bitbucket: `([Bitbucket](https://bitbucket.org/user/repo/src/[branch]/src/utils/[file]#lines-[numbers]))`
+- Azure DevOps: `([Azure DevOps](https://dev.azure.com/organization/project/_git/project?path=src%2Futils%2Fvscode.ts&version=GB[branch]&line=[number]&lineEnd=[number]))`
 
 ## Extension Settings
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
 This extension contributes the following settings:
 
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
+- ```saucer.includeRelativePath```: Include relative file path in references (default: ```true```)
+  - When `true`, references include the path, i.e. `src/foo.ts:10`
+  - When `false`, references include the only the filename, i.e. `foo.ts:10`
+- ```saucer.linkSource```: Include source code links when available (default: ```true```)
+  - When `true`, appends source link as described in 'Different Git Providers' section and formats the reference in Markdown.
+  - When `false`, just returns the reference in plaintext.
+- ```saucer.cursorReferenceType```: Default reference type for cursor position (default: ```Ask```)
+- ```saucer.selectionReferenceType```: Default reference type for selections (default: ```Ask```)
 
-## Known Issues
+## Requirements
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+- VS Code 1.99.0 or higher
 
-## Release Notes
+## Installation
 
-Users appreciate release notes as you update your extension.
+1. Open VS Code
+2. Go to Extensions view (Ctrl+Shift+X)
+3. Search for "Saucer"
+4. Click Install
 
-### 1.0.0
+## Keyboard Shortcuts
 
-Initial release of ...
+- Windows/Linux: ```Alt+Shift+C```
+- macOS: ```Alt+Shift+C```
 
-### 1.0.1
+## Supported Git Providers
 
-Fixed issue #.
+- [GitHub](https://github.com)
+- [GitLab](https://gitlab.com)
+- [Bitbucket](https://bitbucket.org)
+- [Azure DevOps](https://dev.azure.com)
+- Generic Git repositories (fallback option, limited functionality)
 
-### 1.1.0
+## License
 
-Added features X, Y, and Z.
-
----
-
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
-
-## For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+MIT
