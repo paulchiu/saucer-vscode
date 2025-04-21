@@ -2,6 +2,7 @@
   "name": "saucer",
   "displayName": "Saucer",
   "description": "VSCode extension that copies code reference with Git provider source links as Markdown for sharing.",
+  "repository": "https://github.com/paulchiu/saucer-vscode",
   "version": "1.0.0",
   "icon": "icon.png",
   "engines": {
