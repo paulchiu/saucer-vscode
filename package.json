@@ -1,8 +1,9 @@
 {
   "name": "saucer",
   "displayName": "Saucer",
-  "description": "VSCode extension that copies code reference with Git provider source links as Markdown for sharing.",
+  "description": "Copy code reference with Git provider source links as Markdown for sharing",
   "repository": "https://github.com/paulchiu/saucer-vscode",
+  "publisher": "paulchiu",
   "version": "1.0.0",
   "icon": "icon.png",
   "engines": {
@@ -15,7 +16,7 @@
     "onLanguage:typescript",
     "onLanguage:typescriptreact"
   ],
-  "main": "./out/extension.js",
+  "main": "./dist/extension.js",
   "contributes": {
     "configuration": {
       "title": "Saucer",
@@ -76,16 +77,20 @@
     ]
   },
   "scripts": {
-    "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
-    "pretest": "npm run compile && npm run lint",
+    "check-types": "tsc --noEmit",
+    "compile": "npm run check-types && node esbuild.js",
+    "fmt": "prettier -w .",
     "lint": "eslint src && knip",
     "lint:fix": "eslint src --fix && knip --fix",
-    "fmt": "prettier -w .",
-    "test:vscode": "vscode-test",
+    "package": "npm run check-types && node esbuild.js --production",
+    "pretest": "npm run compile && npm run lint",
     "test:unit": "vitest run unit.test.ts",
-    "test:unit:watch": "vitest watch run unit.test.ts"
+    "test:unit:watch": "vitest watch run unit.test.ts",
+    "test:vscode": "vscode-test",
+    "vscode:prepublish": "npm run package",
+    "watch": "npm-run-all -p watch:*",
+    "watch:esbuild": "node esbuild.js --watch",
+    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json"
   },
   "devDependencies": {
     "@types/node": "20.x",
@@ -93,8 +98,10 @@
     "@typescript-eslint/eslint-plugin": "^8.28.0",
     "@typescript-eslint/parser": "^8.28.0",
     "@vscode/test-cli": "^0.0.10",
+    "esbuild": "^0.25.2",
     "eslint": "^9.23.0",
     "knip": "^5.50.5",
+    "npm-run-all": "^4.1.5",
     "prettier": "^3.5.3",
     "typescript": "^5.8.2",
     "vitest": "^3.1.1"
