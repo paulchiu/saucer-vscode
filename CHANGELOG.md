@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.1] - Supported version change
+
+- Updated supported version to 1.90.0 to allow install in Haystack Editor
+
 ## [1.0.0] - Release
 
 - Initial release
