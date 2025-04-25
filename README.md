@@ -1,5 +1,9 @@
 # Saucer
 
+[![CI](https://github.com/paulchiu/saucer-vscode/actions/workflows/ci.yml/badge.svg)](https://github.com/paulchiu/saucer-vscode/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/paulchiu/saucer-vscode/graph/badge.svg?token=3PY54ZDG9N)](https://codecov.io/gh/paulchiu/saucer-vscode)
+[![License](https://img.shields.io/github/license/paulchiu/saucer-vscode)](https://github.com/paulchiu/saucer-vscode/blob/main/LICENSE)
+
 A VS Code extension that provides IntelliJ WebStorm-like copy reference functionality<sup>1</sup>. Easily copy Markdown style code references with source links for sharing.
 
 1: Tested with TypeScript but should work with other languages where VS Code symbol detection works
