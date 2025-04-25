@@ -15,7 +15,7 @@ A VS Code extension that provides IntelliJ WebStorm-like copy reference function
 ## Usage
 
 1. Place your cursor on a TypeScript symbol or select a few lines of code
-2. Right-click and select "Copy Reference" or use the keyboard shortcut (```Alt+Shift+C``` on Windows/Linux, ```Opt+Shift+C``` on macOS)
+2. Right-click and select "Copy Reference" or use the keyboard shortcut (`Alt+Shift+C` on Windows/Linux, `Opt+Shift+C` on macOS)
 3. Choose a reference format when prompted:
    - **Symbol**: Copies the symbol path; i.e. `Class.method`
    - **Filename**: Copies the file name with line reference; i.e. `foo.ts:10`
@@ -67,14 +67,14 @@ When source link is enabled (default) appropriate links are generated on your wo
 
 This extension contributes the following settings:
 
-- ```saucer.includeRelativePath```: Include relative file path in references (default: ```true```)
+- `saucer.includeRelativePath`: Include relative file path in references (default: `true`)
   - When `true`, references include the path, i.e. `src/foo.ts:10`
   - When `false`, references include the only the filename, i.e. `foo.ts:10`
-- ```saucer.linkSource```: Include source code links when available (default: ```true```)
+- `saucer.linkSource`: Include source code links when available (default: `true`)
   - When `true`, appends source link as described in 'Different Git Providers' section and formats the reference in Markdown.
   - When `false`, just returns the reference in plaintext.
-- ```saucer.cursorReferenceType```: Default reference type for cursor position (default: ```Ask```)
-- ```saucer.selectionReferenceType```: Default reference type for selections (default: ```Ask```)
+- `saucer.cursorReferenceType`: Default reference type for cursor position (default: `Ask`)
+- `saucer.selectionReferenceType`: Default reference type for selections (default: `Ask`)
 
 ## Requirements
 
@@ -89,8 +89,8 @@ This extension contributes the following settings:
 
 ## Keyboard Shortcuts
 
-- Windows/Linux: ```Alt+Shift+C```
-- macOS: ```Alt+Shift+C```
+- Windows/Linux: `Alt+Shift+C`
+- macOS: `Alt+Shift+C`
 
 ## Supported Git Providers
 

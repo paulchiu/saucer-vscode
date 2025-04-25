@@ -25,5 +25,4 @@ export const executeCommand = vscode.commands.executeCommand
 
 export const registerCommand = vscode.commands.registerCommand
 
-export const getConfig = () =>
-  vscode.workspace.getConfiguration('saucer')
+export const getConfig = () => vscode.workspace.getConfiguration('saucer')

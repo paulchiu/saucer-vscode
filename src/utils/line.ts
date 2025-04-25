@@ -4,10 +4,7 @@ import { GitProvider } from './git'
 import { Reference } from './reference'
 import { ReferenceRange } from './referenceRange'
 
-function toProviderCursorLine(
-  provider: GitProvider,
-  line: number
-): string {
+function toProviderCursorLine(provider: GitProvider, line: number): string {
   return match(provider)
     .with('github', () => `#L${line}`)
     .with('gitlab', () => `#L${line}`)
