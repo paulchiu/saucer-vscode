@@ -29,11 +29,13 @@ updates:
           - "npm-run-all"
           - "@vscode/*"
         update-types:
+          - "major"
           - "minor"
           - "patch"
       runtime-dependencies:
         patterns:
           - "ts-pattern"
         update-types:
+          - "major"
           - "minor"
           - "patch"
