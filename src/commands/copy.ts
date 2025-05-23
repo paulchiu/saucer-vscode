@@ -22,9 +22,12 @@ export async function copy(): Promise<void> {
   }
 }
 
-async function getCopyContent(): Promise<string> {
+async function getCopyContent(): Promise<string | undefined> {
   const config = getConfig()
   const reference = await getReference(config)
+  if (!reference) {
+    return undefined
+  }
 
   const source = await match(config.linkSource)
     .with(true, async () => {
