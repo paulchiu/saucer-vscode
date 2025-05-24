@@ -48,8 +48,16 @@ async function getCopyContent(): Promise<string | null> {
   const referenceString =
     (await match([reference.type, config.includeRelativePath])
       .with(['Symbol', P.any], () => getSymbol())
-      .with(['Filename', true], () => `${reference.relativePath}:${lines}`)
-      .with(['Filename', false], () => `${reference.fileName}:${lines}`)
+      .with(
+        ['Filename (with line)', true],
+        () => `${reference.relativePath}:${lines}`
+      )
+      .with(
+        ['Filename (with line)', false],
+        () => `${reference.fileName}:${lines}`
+      )
+      .with(['Filename (no line)', true], () => reference.relativePath)
+      .with(['Filename (no line)', false], () => reference.fileName)
       .exhaustive()) ?? ''
 
   const codeString = referenceString ? surround(referenceString, '`') : ''

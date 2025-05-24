@@ -15,9 +15,11 @@ describe('utils/referenceType', () => {
     })
 
     it.each`
-      configType    | expected
-      ${'Symbol'}   | ${'Symbol'}
-      ${'Filename'} | ${'Filename'}
+      configType                | expected
+      ${'Symbol'}               | ${'Symbol'}
+      ${'Filename (with line)'} | ${'Filename (with line)'}
+      ${'Filename (no line)'}   | ${'Filename (no line)'}
+      ${'Filename'}             | ${'Filename (with line)'}
     `(
       'should return reference type when configType=$configType matches',
       async ({ configType, expected }) => {
@@ -27,10 +29,10 @@ describe('utils/referenceType', () => {
     )
 
     it.each`
-      configType   | userChoice    | expected
-      ${undefined} | ${'Symbol'}   | ${'Symbol'}
-      ${'Invalid'} | ${'Filename'} | ${'Filename'}
-      ${null}      | ${'Symbol'}   | ${'Symbol'}
+      configType   | userChoice                | expected
+      ${undefined} | ${'Symbol'}               | ${'Symbol'}
+      ${'Invalid'} | ${'Filename (with line)'} | ${'Filename (with line)'}
+      ${null}      | ${'Symbol'}               | ${'Symbol'}
     `(
       'should prompt user when configType=$configType is invalid and return userChoice=$userChoice',
       async ({ configType, userChoice, expected }) => {
@@ -38,9 +40,12 @@ describe('utils/referenceType', () => {
 
         const result = await sut(configType)
 
-        expect(showQuickPick).toHaveBeenCalledWith(['Symbol', 'Filename'], {
-          placeHolder: 'Select reference type',
-        })
+        expect(showQuickPick).toHaveBeenCalledWith(
+          ['Symbol', 'Filename (with line)', 'Filename (no line)'],
+          {
+            placeHolder: 'Select reference type',
+          }
+        )
         expect(result).toEqual(expected)
       }
     )
@@ -61,10 +66,18 @@ describe('utils/referenceType', () => {
 
       const result = await sut(undefined)
 
-      expect(showQuickPick).toHaveBeenCalledWith(['Symbol', 'Filename'], {
-        placeHolder: 'Select reference type',
-      })
+      expect(showQuickPick).toHaveBeenCalledWith(
+        ['Symbol', 'Filename (with line)', 'Filename (no line)'],
+        {
+          placeHolder: 'Select reference type',
+        }
+      )
       expect(result).toBeUndefined()
+    })
+
+    it('should handle backward compatibility by converting old Filename config to Filename (with line)', async () => {
+      const result = await sut('Filename')
+      expect(result).toEqual('Filename (with line)')
     })
   })
 })

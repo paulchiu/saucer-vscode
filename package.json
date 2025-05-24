@@ -4,7 +4,7 @@
   "description": "Copy code reference with Git provider source links as Markdown for sharing",
   "repository": "https://github.com/paulchiu/saucer-vscode",
   "publisher": "paulchiu",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "icon": "icon.png",
   "engines": {
     "vscode": "^1.90.0"
@@ -36,7 +36,8 @@
           "enum": [
             "Ask",
             "Symbol",
-            "Filename"
+            "Filename (with line)",
+            "Filename (no line)"
           ],
           "default": "Ask",
           "description": "When referencing cursor position, use"
@@ -46,7 +47,8 @@
           "enum": [
             "Ask",
             "Symbol",
-            "Filename"
+            "Filename (with line)",
+            "Filename (no line)"
           ],
           "default": "Ask",
           "description": "When referencing a selection, use"

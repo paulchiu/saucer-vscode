@@ -22,7 +22,8 @@ A VS Code extension that provides IntelliJ WebStorm-like copy reference function
 2. Right-click and select "Copy Reference" or use the keyboard shortcut (`Alt+Shift+C` on Windows/Linux, `Opt+Shift+C` on macOS)
 3. Choose a reference format when prompted:
    - **Symbol**: Copies the symbol path; i.e. `Class.method`
-   - **Filename**: Copies the file name with line reference; i.e. `foo.ts:10`
+   - **Filename (with line)**: Copies the file name with line reference; i.e. `foo.ts:10`
+   - **Filename (no line)**: Copies the file name without line reference; i.e. `foo.ts`
 
 The copied reference includes a link to the source code repository when configured and available.
 
@@ -78,7 +79,9 @@ This extension contributes the following settings:
   - When `true`, appends source link as described in 'Different Git Providers' section and formats the reference in Markdown.
   - When `false`, just returns the reference in plaintext.
 - `saucer.cursorReferenceType`: Default reference type for cursor position (default: `Ask`)
+  - Options: `Ask`, `Symbol`, `Filename (with line)`, `Filename (no line)`
 - `saucer.selectionReferenceType`: Default reference type for selections (default: `Ask`)
+  - Options: `Ask`, `Symbol`, `Filename (with line)`, `Filename (no line)`
 
 ## Requirements
 

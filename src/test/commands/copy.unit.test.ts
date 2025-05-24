@@ -131,10 +131,10 @@ describe('commands/copy', () => {
       )
     })
 
-    it('should generate filename reference when type is Filename and includeRelativePath is true', async () => {
+    it('should generate filename reference when type is Filename (with line) and includeRelativePath is true', async () => {
       const filenameReference = {
         ...mockReference,
-        type: 'Filename',
+        type: 'Filename (with line)',
       }
       vi.mocked(getReference).mockResolvedValue(filenameReference as any)
       vi.mocked(getRemoteInfo).mockResolvedValue({
@@ -158,7 +158,7 @@ describe('commands/copy', () => {
       }
       const filenameReference = {
         ...mockReference,
-        type: 'Filename',
+        type: 'Filename (with line)',
       }
       vi.mocked(getConfig).mockReturnValue(configWithoutRelativePath as any)
       vi.mocked(getReference).mockResolvedValue(filenameReference as any)
@@ -172,6 +172,71 @@ describe('commands/copy', () => {
 
       expect(copyToClipboard).toHaveBeenCalledWith(
         '`file.ts:10` ([GitHub](https://github.com/user/repo/blob/main/src/utils/file.ts))'
+      )
+      expect(showInfo).toHaveBeenCalledWith('Reference copied')
+    })
+
+    it('should generate filename reference without line numbers when type is Filename (no line) and includeRelativePath is true', async () => {
+      const filenameNoLineReference = {
+        ...mockReference,
+        type: 'Filename (no line)',
+      }
+      vi.mocked(getReference).mockResolvedValue(filenameNoLineReference as any)
+      vi.mocked(getRemoteInfo).mockResolvedValue({
+        provider: 'github',
+        url: 'https://github.com/user/repo',
+      } as any)
+      vi.mocked(getCurrentBranch).mockResolvedValue('main')
+
+      await copy()
+
+      expect(copyToClipboard).toHaveBeenCalledWith(
+        '`src/utils/file.ts` ([GitHub](https://github.com/user/repo/blob/main/src/utils/file.ts))'
+      )
+      expect(showInfo).toHaveBeenCalledWith('Reference copied')
+    })
+
+    it('should generate filename reference without line numbers and without relative path when type is Filename (no line) and includeRelativePath is false', async () => {
+      const configWithoutRelativePath = {
+        ...mockConfig,
+        includeRelativePath: false,
+      }
+      const filenameNoLineReference = {
+        ...mockReference,
+        type: 'Filename (no line)',
+      }
+      vi.mocked(getConfig).mockReturnValue(configWithoutRelativePath as any)
+      vi.mocked(getReference).mockResolvedValue(filenameNoLineReference as any)
+      vi.mocked(getRemoteInfo).mockResolvedValue({
+        provider: 'github',
+        url: 'https://github.com/user/repo',
+      } as any)
+      vi.mocked(getCurrentBranch).mockResolvedValue('main')
+
+      await copy()
+
+      expect(copyToClipboard).toHaveBeenCalledWith(
+        '`file.ts` ([GitHub](https://github.com/user/repo/blob/main/src/utils/file.ts))'
+      )
+      expect(showInfo).toHaveBeenCalledWith('Reference copied')
+    })
+
+    it('should handle backward compatibility for old Filename type by treating it as Filename (with line)', async () => {
+      const backwardCompatReference = {
+        ...mockReference,
+        type: 'Filename (with line)', // This is what getReferenceType should return for old 'Filename'
+      }
+      vi.mocked(getReference).mockResolvedValue(backwardCompatReference as any)
+      vi.mocked(getRemoteInfo).mockResolvedValue({
+        provider: 'github',
+        url: 'https://github.com/user/repo',
+      } as any)
+      vi.mocked(getCurrentBranch).mockResolvedValue('main')
+
+      await copy()
+
+      expect(copyToClipboard).toHaveBeenCalledWith(
+        '`src/utils/file.ts:10` ([GitHub](https://github.com/user/repo/blob/main/src/utils/file.ts))'
       )
       expect(showInfo).toHaveBeenCalledWith('Reference copied')
     })
