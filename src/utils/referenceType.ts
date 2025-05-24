@@ -16,13 +16,17 @@ function isReferenceType(type?: string): type is ReferenceType {
 
 export async function getReferenceType(
   configType: string | undefined
-): Promise<ReferenceType> {
+): Promise<ReferenceType | undefined> {
   if (isReferenceType(configType)) {
     return configType
   } else {
     const userChoice = await showQuickPick(REFERENCE_TYPES, {
       placeHolder: REFERENCE_TYPE_PLACEHOLDER,
     })
+
+    if (userChoice === undefined) {
+      return undefined
+    }
 
     return getReferenceType(userChoice)
   }

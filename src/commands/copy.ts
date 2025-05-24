@@ -14,6 +14,9 @@ export async function copy(): Promise<void> {
     if (reference) {
       await copyToClipboard(reference)
       showInfo('Reference copied')
+    } else if (reference === null) {
+      // User canceled, don't show any message
+      return
     } else {
       showWarn('No identifiable reference to copy')
     }
@@ -22,9 +25,13 @@ export async function copy(): Promise<void> {
   }
 }
 
-async function getCopyContent(): Promise<string> {
+async function getCopyContent(): Promise<string | null> {
   const config = getConfig()
   const reference = await getReference(config)
+
+  if (!reference) {
+    return null
+  }
 
   const source = await match(config.linkSource)
     .with(true, async () => {

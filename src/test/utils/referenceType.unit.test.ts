@@ -55,5 +55,16 @@ describe('utils/referenceType', () => {
       expect(showQuickPick).toHaveBeenCalledTimes(2)
       expect(result).toEqual('Symbol')
     })
+
+    it('should return undefined when user cancels quick pick', async () => {
+      vi.mocked(showQuickPick).mockResolvedValueOnce(undefined)
+
+      const result = await sut(undefined)
+
+      expect(showQuickPick).toHaveBeenCalledWith(['Symbol', 'Filename'], {
+        placeHolder: 'Select reference type',
+      })
+      expect(result).toBeUndefined()
+    })
   })
 })

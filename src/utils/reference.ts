@@ -15,7 +15,9 @@ export type Reference = {
   fileName: string
 }
 
-export async function getReference(config: Config): Promise<Reference> {
+export async function getReference(
+  config: Config
+): Promise<Reference | undefined> {
   const { editor, document, folder } = getContext()
 
   // Selection
@@ -36,6 +38,10 @@ export async function getReference(config: Config): Promise<Reference> {
       getReferenceType(config.selectionRefType)
     )
     .exhaustive()
+
+  if (type === undefined) {
+    return undefined
+  }
 
   return {
     type,

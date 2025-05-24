@@ -130,6 +130,32 @@ describe('utils/reference', () => {
         fileName: 'file.ts',
       })
     })
+
+    it('should return undefined when getReferenceType returns undefined (user canceled)', async () => {
+      const mockEditor = { selection: { active: { line: 1, character: 5 } } }
+      const mockDocument = {
+        uri: {
+          fsPath: '/workspace/project/file.ts',
+          path: '/workspace/project/file.ts',
+        },
+      }
+      const mockFolder = { uri: { fsPath: '/workspace/project' } }
+
+      vi.mocked(getContext).mockReturnValue({
+        editor: mockEditor,
+        document: mockDocument,
+        folder: mockFolder,
+      } as any)
+
+      const mockRange = { kind: 'cursor', line: 1 }
+      vi.mocked(fromSelection).mockReturnValue(mockRange as any)
+      vi.mocked(getReferenceType).mockResolvedValue(undefined) // User canceled
+
+      const result = await sut(mockConfig)
+
+      expect(result).toBeUndefined()
+      expect(getReferenceType).toHaveBeenCalledWith(mockConfig.cursorRefType)
+    })
   })
 
   describe('toSourceLink', () => {

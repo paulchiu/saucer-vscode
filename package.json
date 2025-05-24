@@ -4,7 +4,7 @@
   "description": "Copy code reference with Git provider source links as Markdown for sharing",
   "repository": "https://github.com/paulchiu/saucer-vscode",
   "publisher": "paulchiu",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "icon": "icon.png",
   "engines": {
     "vscode": "^1.90.0"
@@ -94,11 +94,12 @@
     "test:coverage": "vitest run --coverage",
     "test:vscode": "vscode-test",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "watch": "npm run dev"
   },
   "devDependencies": {
     "@types/node": "22.x",
-    "@types/vscode": "^1.100.0",
+    "@types/vscode": "^1.90.0",
     "@typescript-eslint/eslint-plugin": "^8.32.1",
     "@typescript-eslint/parser": "^8.32.1",
     "@vitest/coverage-v8": "^3.1.4",
