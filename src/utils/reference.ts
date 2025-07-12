@@ -4,7 +4,7 @@ import { Config } from './config'
 import { getContext } from './context'
 import { fromSelection, ReferenceRange } from './referenceRange'
 import { getReferenceType, ReferenceType } from './referenceType'
-import { RemoteInfo } from './git'
+import { RemoteInfo, getGitContext } from './git'
 import { toProviderLineFragment } from './line'
 import { buildAzureSourceUrl } from './azure'
 
@@ -14,6 +14,8 @@ export type Reference = {
   workspacePath: string
   relativePath: string
   fileName: string
+  gitRoot?: string
+  pathFromGitRoot?: string
 }
 
 export async function getReference(
@@ -25,12 +27,35 @@ export async function getReference(
   const selection = editor.selection
   const range = fromSelection(selection)
 
-  // Path
+  // Path calculations
   const workspacePath = folder?.uri.fsPath
   const relativePath = folder
     ? path.relative(folder.uri.fsPath, document.uri.fsPath)
     : document.uri.path
   const fileName = basename(relativePath)
+
+  // Git context for enhanced path calculation
+  let gitRoot: string | undefined
+  let pathFromGitRoot: string | undefined
+
+  if (config.useGitRoot && workspacePath) {
+    try {
+      const gitContext = await getGitContext(workspacePath)
+      gitRoot = gitContext.gitRoot
+
+      if (gitRoot) {
+        // Calculate path from git root to the current file
+        const absoluteFilePath = path.resolve(folder?.uri.fsPath || '', relativePath)
+        pathFromGitRoot = path.relative(gitRoot, absoluteFilePath)
+        
+        // Ensure we use forward slashes for consistency across platforms
+        pathFromGitRoot = pathFromGitRoot.replace(/\\/g, '/')
+      }
+    } catch (_error) {
+      // Git operations failed, continue with workspace-relative paths
+      // gitRoot and pathFromGitRoot remain undefined
+    }
+  }
 
   // Type
   const type = await match(range)
@@ -50,6 +75,8 @@ export async function getReference(
     workspacePath,
     relativePath,
     fileName,
+    gitRoot,
+    pathFromGitRoot,
   }
 }
 
@@ -59,28 +86,31 @@ export function toSourceLink(
   reference: Reference
 ): string | undefined {
   const lineFragment = toProviderLineFragment(remoteInfo, reference)
+  
+  // Use git-relative path when available, otherwise fall back to workspace-relative path
+  const referencePath = reference.pathFromGitRoot || reference.relativePath
 
   return match(remoteInfo)
     .with(
       { provider: 'github' },
       ({ url }) =>
-        `[GitHub](${url}/blob/${branch}/${reference.relativePath}${lineFragment})`
+        `[GitHub](${url}/blob/${branch}/${referencePath}${lineFragment})`
     )
     .with(
       { provider: 'gitlab' },
       ({ url }) =>
-        `[GitLab](${url}/-/blob/${branch}/${reference.relativePath}${lineFragment})`
+        `[GitLab](${url}/-/blob/${branch}/${referencePath}${lineFragment})`
     )
     .with(
       { provider: 'bitbucket' },
       ({ url }) =>
-        `[Bitbucket](${url}/src/${branch}/${reference.relativePath}${lineFragment})`
+        `[Bitbucket](${url}/src/${branch}/${referencePath}${lineFragment})`
     )
     .with({ provider: 'azure' }, ({ url }) => {
       const formattedUrl = buildAzureSourceUrl(
         url,
         branch,
-        reference.relativePath,
+        referencePath,
         lineFragment
       )
       return formattedUrl ? `[Azure DevOps](${formattedUrl})` : undefined

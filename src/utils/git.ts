@@ -1,5 +1,6 @@
 import { match } from 'ts-pattern'
 import { execAsync } from './exec'
+import * as path from 'path'
 
 export type GitProvider =
   | 'github'
@@ -14,6 +15,72 @@ export type RemoteInfo =
       url: string
     }
   | { provider: 'unknown' }
+
+export type GitContext = {
+  gitRoot?: string
+  workspacePath: string
+  relativePath?: string
+}
+
+const gitRootCache = new Map<string, string | undefined>()
+
+// Export cache clearing function for testing
+export function __clearGitRootCache(): void {
+  gitRootCache.clear()
+}
+
+export async function findGitRoot(
+  startPath: string
+): Promise<string | undefined> {
+  // Check cache first
+  const cachedResult = gitRootCache.get(startPath)
+  if (cachedResult !== undefined) {
+    return cachedResult === '' ? undefined : cachedResult
+  }
+
+  try {
+    const { stdout } = await execAsync('git rev-parse --show-toplevel', {
+      cwd: startPath,
+    })
+
+    const gitRoot = stdout.trim()
+    if (gitRoot) {
+      gitRootCache.set(startPath, gitRoot)
+      return gitRoot
+    }
+  } catch (_error) {
+    // Cache failures to avoid repeated attempts
+    gitRootCache.set(startPath, '')
+  }
+
+  return undefined
+}
+
+export async function getGitContext(
+  workspacePath: string
+): Promise<GitContext> {
+  const gitRoot = await findGitRoot(workspacePath)
+
+  const context: GitContext = {
+    workspacePath,
+    gitRoot,
+  }
+
+  // Calculate relative path from git root to workspace if both are available
+  if (gitRoot && workspacePath) {
+    try {
+      const relativePath = path.relative(gitRoot, workspacePath)
+      // Only set relativePath if workspace is actually within git root
+      if (relativePath && !relativePath.startsWith('..')) {
+        context.relativePath = relativePath === '.' ? undefined : relativePath
+      }
+    } catch (_error) {
+      // Path calculation failed, leave relativePath undefined
+    }
+  }
+
+  return context
+}
 
 function isValidGitUrl(url: string): boolean {
   // Handle SSH URLs (git@github.com:user/repo.git)

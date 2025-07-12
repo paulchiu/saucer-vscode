@@ -52,6 +52,11 @@
           ],
           "default": "Ask",
           "description": "When referencing a selection, use"
+        },
+        "saucer.useGitRoot": {
+          "type": "boolean",
+          "default": true,
+          "description": "Use git root for path calculations when available (improves accuracy for subdirectory workspaces)"
         }
       }
     },

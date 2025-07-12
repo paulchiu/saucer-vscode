@@ -31,6 +31,7 @@ describe('getConfig', () => {
       linkSource: true,
       cursorRefType: 'Ask',
       selectionRefType: 'Ask',
+      useGitRoot: true,
     })
   })
 
@@ -42,6 +43,7 @@ describe('getConfig', () => {
           linkSource: false,
           cursorReferenceType: 'Line',
           selectionReferenceType: 'Range',
+          useGitRoot: false,
         }
         return values[key] ?? defaultValue
       }),
@@ -58,6 +60,7 @@ describe('getConfig', () => {
       linkSource: false,
       cursorRefType: 'Line',
       selectionRefType: 'Range',
+      useGitRoot: false,
     })
   })
 
@@ -83,6 +86,32 @@ describe('getConfig', () => {
       linkSource: true,
       cursorRefType: 'Ask',
       selectionRefType: 'Range',
+      useGitRoot: true,
+    })
+  })
+
+  it('should return useGitRoot as false when explicitly set', () => {
+    const disabledGitRootConfig = {
+      get: vi.fn().mockImplementation((key: string, defaultValue: any) => {
+        const values: Record<string, any> = {
+          useGitRoot: false,
+        }
+        return values[key] ?? defaultValue
+      }),
+    }
+    mockGetConfig.mockReturnValue(
+      disabledGitRootConfig as unknown as WorkspaceConfiguration
+    )
+
+    const result = sut()
+
+    expect(mockGetConfig).toHaveBeenCalledTimes(1)
+    expect(result).toEqual({
+      includeRelativePath: true,
+      linkSource: true,
+      cursorRefType: 'Ask',
+      selectionRefType: 'Ask',
+      useGitRoot: false,
     })
   })
 })

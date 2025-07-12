@@ -2,7 +2,11 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import {
   getRemoteInfo,
   getCurrentBranch,
+  findGitRoot,
+  getGitContext,
+  __clearGitRootCache,
   type RemoteInfo,
+  type GitContext,
 } from '../../utils/git'
 import { execAsync } from '../../utils/exec'
 
@@ -287,6 +291,171 @@ describe('utils/git', () => {
           expect(result).toHaveProperty('provider', 'azure')
         }
       )
+    })
+  })
+
+  describe('findGitRoot', () => {
+    const sut = findGitRoot
+
+    beforeEach(() => {
+      // Clear the cache before each test to ensure isolation
+      __clearGitRootCache()
+    })
+
+    it('should return git root path when in git repository', async () => {
+      mockExecAsync.mockResolvedValueOnce({
+        stdout: '/Users/test/project\n',
+        stderr: '',
+      })
+
+      const result = await sut(testWorkspacePath)
+
+      expect(result).toBe('/Users/test/project')
+      expect(mockExecAsync).toHaveBeenCalledWith(
+        'git rev-parse --show-toplevel',
+        { cwd: testWorkspacePath }
+      )
+    })
+
+    it('should return undefined when not in git repository', async () => {
+      mockExecAsync.mockRejectedValueOnce(new Error('fatal: not a git repository'))
+
+      const result = await sut('/different/path')
+
+      expect(result).toBeUndefined()
+    })
+
+    it('should return undefined when git command returns empty output', async () => {
+      mockExecAsync.mockResolvedValueOnce({
+        stdout: '',
+        stderr: '',
+      })
+
+      const result = await sut('/empty/path')
+
+      expect(result).toBeUndefined()
+    })
+
+    it('should cache results for performance', async () => {
+      const cachePath = '/cache/test'
+      mockExecAsync.mockResolvedValueOnce({
+        stdout: '/Users/test/project\n',
+        stderr: '',
+      })
+
+      // First call should execute git command
+      const result1 = await sut(cachePath)
+      expect(result1).toBe('/Users/test/project')
+      expect(mockExecAsync).toHaveBeenCalledTimes(1)
+
+      // Second call should use cached result
+      const result2 = await sut(cachePath)
+      expect(result2).toBe('/Users/test/project')
+      expect(mockExecAsync).toHaveBeenCalledTimes(1) // No additional calls
+    })
+
+    it('should cache failure results to avoid repeated attempts', async () => {
+      const failPath = '/fail/path'
+      mockExecAsync.mockRejectedValueOnce(new Error('fatal: not a git repository'))
+
+      // First call should attempt git command
+      const result1 = await sut(failPath)
+      expect(result1).toBeUndefined()
+      expect(mockExecAsync).toHaveBeenCalledTimes(1)
+
+      // Second call should use cached failure result
+      const result2 = await sut(failPath)
+      expect(result2).toBeUndefined()
+      expect(mockExecAsync).toHaveBeenCalledTimes(1) // No additional calls
+    })
+  })
+
+  describe('getGitContext', () => {
+    const sut = getGitContext
+
+    beforeEach(() => {
+      // Clear cache before each test
+      __clearGitRootCache()
+      vi.resetAllMocks()
+    })
+
+    it('should provide git context when in git repository at root level', async () => {
+      mockExecAsync.mockResolvedValueOnce({
+        stdout: '/Users/test/project\n',
+        stderr: '',
+      })
+
+      const result = await sut('/Users/test/project')
+
+      const expected: GitContext = {
+        workspacePath: '/Users/test/project',
+        gitRoot: '/Users/test/project',
+        relativePath: undefined, // workspace is at git root
+      }
+      expect(result).toEqual(expected)
+    })
+
+    it('should provide git context when in git repository subdirectory', async () => {
+      mockExecAsync.mockResolvedValueOnce({
+        stdout: '/Users/test/project\n',
+        stderr: '',
+      })
+
+      const result = await sut('/Users/test/project/frontend')
+
+      const expected: GitContext = {
+        workspacePath: '/Users/test/project/frontend',
+        gitRoot: '/Users/test/project',
+        relativePath: 'frontend',
+      }
+      expect(result).toEqual(expected)
+    })
+
+    it('should handle workspace outside git repository', async () => {
+      const nonGitPath = '/non/git/workspace'
+      mockExecAsync.mockRejectedValueOnce(new Error('fatal: not a git repository'))
+
+      const result = await sut(nonGitPath)
+
+      const expected: GitContext = {
+        workspacePath: nonGitPath,
+        gitRoot: undefined,
+        relativePath: undefined,
+      }
+      expect(result).toEqual(expected)
+    })
+
+    it('should handle nested subdirectories correctly', async () => {
+      mockExecAsync.mockResolvedValueOnce({
+        stdout: '/Users/test/project\n',
+        stderr: '',
+      })
+
+      const result = await sut('/Users/test/project/apps/frontend/src')
+
+      const expected: GitContext = {
+        workspacePath: '/Users/test/project/apps/frontend/src',
+        gitRoot: '/Users/test/project',
+        relativePath: 'apps/frontend/src',
+      }
+      expect(result).toEqual(expected)
+    })
+
+    it('should handle workspace outside of git root gracefully', async () => {
+      const workspacePath = '/Users/test/other/project'
+      mockExecAsync.mockResolvedValueOnce({
+        stdout: '/Users/test/different-project\n',
+        stderr: '',
+      })
+
+      const result = await sut(workspacePath)
+
+      const expected: GitContext = {
+        workspacePath: workspacePath,
+        gitRoot: '/Users/test/different-project',
+        relativePath: undefined, // workspace is outside git root
+      }
+      expect(result).toEqual(expected)
     })
   })
 })
