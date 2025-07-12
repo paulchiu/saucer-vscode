@@ -5,6 +5,11 @@ All notable changes to the "saucer" extension will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.1] - Azure DevOps URL support
+
+- Fixed Azure DevOps URL parsing and source URL building utilities
+- Enhanced Azure DevOps URL processing with support for HTTPS, SSH, and legacy visualstudio.com formats
+
 ## [1.2.0] - Filename reference without line numbers
 
 - Added "Filename (no line)" option to reference types
