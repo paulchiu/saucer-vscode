@@ -89,6 +89,77 @@ describe('utils/git', () => {
         expect(result).toEqual(expected)
       }
     )
+
+    describe('Azure DevOps provider tests', () => {
+      it.each`
+        remoteUrl                                               | expectedUrl
+        ${'https://dev.azure.com/org/project'}                  | ${'https://dev.azure.com/org/project'}
+        ${'https://dev.azure.com/org/project/_git/repo'}        | ${'https://dev.azure.com/org/project/_git/repo'}
+        ${'https://dev.azure.com/org/project/_git/repo.git'}    | ${'https://dev.azure.com/org/project/_git/repo.git'}
+        ${'git@ssh.dev.azure.com:v3/org/project/repo'}          | ${'https://dev.azure.com/org/project'}
+        ${'https://org.visualstudio.com/project'}               | ${'https://dev.azure.com/org/project'}
+        ${'https://org.visualstudio.com/project/_git/repo'}     | ${'https://org.visualstudio.com/project/_git/repo'}
+        ${'https://org.visualstudio.com/project/_git/repo.git'} | ${'https://org.visualstudio.com/project/_git/repo.git'}
+      `(
+        'should correctly identify and normalize Azure URL: $remoteUrl',
+        async ({ remoteUrl, expectedUrl }) => {
+          mockExecAsync.mockResolvedValueOnce({
+            stdout: `origin\t${remoteUrl} (fetch)\norigin\t${remoteUrl} (push)`,
+            stderr: '',
+          })
+
+          const result = await sut(testWorkspacePath)
+
+          expect(result).toEqual({
+            provider: 'azure',
+            url: expectedUrl,
+          })
+        }
+      )
+
+      it('should detect Azure DevOps with dev.azure.com domain', async () => {
+        mockExecAsync.mockResolvedValueOnce({
+          stdout: 'origin\thttps://dev.azure.com/myorg/myproject (fetch)',
+          stderr: '',
+        })
+
+        const result = await sut(testWorkspacePath)
+
+        expect(result).toEqual({
+          provider: 'azure',
+          url: 'https://dev.azure.com/myorg/myproject',
+        })
+      })
+
+      it('should detect Azure DevOps with visualstudio.com domain', async () => {
+        mockExecAsync.mockResolvedValueOnce({
+          stdout: 'origin\thttps://myorg.visualstudio.com/myproject (fetch)',
+          stderr: '',
+        })
+
+        const result = await sut(testWorkspacePath)
+
+        expect(result).toEqual({
+          provider: 'azure',
+          url: 'https://dev.azure.com/myorg/myproject',
+        })
+      })
+
+      it('should handle Azure SSH URLs', async () => {
+        mockExecAsync.mockResolvedValueOnce({
+          stdout:
+            'origin\tgit@ssh.dev.azure.com:v3/myorg/myproject/myrepo (fetch)',
+          stderr: '',
+        })
+
+        const result = await sut(testWorkspacePath)
+
+        expect(result).toEqual({
+          provider: 'azure',
+          url: 'https://dev.azure.com/myorg/myproject',
+        })
+      })
+    })
   })
 
   describe('getCurrentBranch', () => {
@@ -191,5 +262,31 @@ describe('utils/git', () => {
         expect(result).toHaveProperty('url', expectedUrl)
       }
     )
+
+    describe('Azure URL normalization', () => {
+      it.each`
+        remoteUrl                                                  | expectedUrl
+        ${'git@ssh.dev.azure.com:v3/myorg/myproject/myrepo'}       | ${'https://dev.azure.com/myorg/myproject'}
+        ${'https://dev.azure.com/myorg/myproject'}                 | ${'https://dev.azure.com/myorg/myproject'}
+        ${'https://dev.azure.com/myorg/myproject.git'}             | ${'https://dev.azure.com/myorg/myproject'}
+        ${'https://myorg.visualstudio.com/myproject'}              | ${'https://dev.azure.com/myorg/myproject'}
+        ${'https://myorg.visualstudio.com/myproject.git'}          | ${'https://dev.azure.com/myorg/myproject.git'}
+        ${'https://dev.azure.com/myorg/myproject/_git/myrepo'}     | ${'https://dev.azure.com/myorg/myproject/_git/myrepo'}
+        ${'https://dev.azure.com/myorg/myproject/_git/myrepo.git'} | ${'https://dev.azure.com/myorg/myproject/_git/myrepo.git'}
+      `(
+        'should normalize Azure URL $remoteUrl to $expectedUrl',
+        async ({ remoteUrl, expectedUrl }) => {
+          mockExecAsync.mockResolvedValueOnce({
+            stdout: `origin\t${remoteUrl} (fetch)`,
+            stderr: '',
+          })
+
+          const result = await getRemoteInfo(testWorkspacePath)
+
+          expect(result).toHaveProperty('url', expectedUrl)
+          expect(result).toHaveProperty('provider', 'azure')
+        }
+      )
+    })
   })
 })
