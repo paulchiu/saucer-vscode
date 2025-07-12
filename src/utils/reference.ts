@@ -77,7 +77,12 @@ export function toSourceLink(
         `[Bitbucket](${url}/src/${branch}/${reference.relativePath}${lineFragment})`
     )
     .with({ provider: 'azure' }, ({ url }) => {
-      const formattedUrl = buildAzureSourceUrl(url, branch, reference.relativePath, lineFragment)
+      const formattedUrl = buildAzureSourceUrl(
+        url,
+        branch,
+        reference.relativePath,
+        lineFragment
+      )
       return formattedUrl ? `[Azure DevOps](${formattedUrl})` : undefined
     })
     .with({ provider: 'generic' }, ({ url }) => `[source](${url})`)
