@@ -16,7 +16,22 @@ jobs:
           node-version: 20
           cache: 'npm'
       - run: npm ci
-      - run: npm run ci
+      - name: Check code formatting
+        run: |
+          echo "Checking code formatting with Prettier..."
+          npm run format || {
+            echo "❌ Formatting issues found. Here are the differences:"
+            echo "Running 'npm run format:fix' to see what would change..."
+            npm run format:fix
+            echo "Git diff after formatting:"
+            git diff --name-only
+            git diff
+            exit 1
+          }
+      - run: npm run typecheck
+      - run: npm run lint  
+      - run: npm run test:coverage
+      - run: npm run build
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5

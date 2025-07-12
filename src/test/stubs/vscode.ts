@@ -427,7 +427,8 @@ export class Range {
 /**
  * A symbol kind.
  */
-enum SymbolKind { // Use export enum for direct value access
+enum SymbolKind {
+  // Use export enum for direct value access
   File = 0,
   Module = 1,
   Namespace = 2,
@@ -459,7 +460,8 @@ enum SymbolKind { // Use export enum for direct value access
 /**
  * Symbol tags are extra annotations that tweak the rendering of a symbol.
  */
-enum SymbolTag { // Use export enum
+enum SymbolTag {
+  // Use export enum
   /**
    * Render a symbol as obsolete, usually using a strike-out.
    */

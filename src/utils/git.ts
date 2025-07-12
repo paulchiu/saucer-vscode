@@ -89,7 +89,7 @@ function determineProvider(rawUrl: string): RemoteInfo {
     .when(
       url => url.includes('dev.azure.com') || url.includes('visualstudio.com'),
       url => ({
-        url,
+        url: normalizeGitUrl(url, 'azure'),
         provider: 'azure',
       })
     )
@@ -114,7 +114,7 @@ export async function getCurrentBranch(
 
 function normalizeGitUrl(
   url: string,
-  provider: 'github' | 'gitlab' | 'bitbucket'
+  provider: 'github' | 'gitlab' | 'bitbucket' | 'azure'
 ): string {
   const patterns = {
     github: {
@@ -129,9 +129,38 @@ function normalizeGitUrl(
       ssh: /^git@(bitbucket\.org):(.+)$/,
       https: /^https:\/\/bitbucket\.org\/(.+)$/,
     },
+    azure: {
+      ssh: /^git@ssh\.dev\.azure\.com:v3\/([^\/]+)\/([^\/]+)\/([^\/]+)$/,
+      https: /^https:\/\/dev\.azure\.com\/([^\/]+)\/([^\/]+)$/,
+      legacy: /^https:\/\/([^\.]+)\.visualstudio\.com\/([^\/]+)$/,
+    },
   }
 
-  // SSH format
+  if (provider === 'azure') {
+    // Handle SSH format: git@ssh.dev.azure.com:v3/org/project/repo
+    const sshMatch = url.match(patterns.azure.ssh)
+    if (sshMatch) {
+      const [, org, project] = sshMatch
+      return `https://dev.azure.com/${org}/${project}`
+    }
+
+    // Handle HTTPS format: https://dev.azure.com/org/project
+    const httpsMatch = url.match(patterns.azure.https)
+    if (httpsMatch) {
+      return url.replace(/\.git$/, '')
+    }
+
+    // Handle legacy visualstudio.com format: https://org.visualstudio.com/project
+    const legacyMatch = url.match(patterns.azure.legacy)
+    if (legacyMatch) {
+      const [, org, project] = legacyMatch
+      return `https://dev.azure.com/${org}/${project}`
+    }
+
+    return url
+  }
+
+  // SSH format for other providers
   const sshMatch = url.match(patterns[provider].ssh)
   if (sshMatch) {
     const host = sshMatch[1]
@@ -139,7 +168,7 @@ function normalizeGitUrl(
     return `https://${host}/${repo}`
   }
 
-  // HTTPS format
+  // HTTPS format for other providers
   const httpsMatch = url.match(patterns[provider].https)
   if (httpsMatch) {
     return url.replace(/\.git$/, '')
