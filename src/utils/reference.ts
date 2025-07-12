@@ -76,15 +76,37 @@ export function toSourceLink(
         `[Bitbucket](${url}/src/${branch}/${reference.relativePath}${lineFragment})`
     )
     .with({ provider: 'azure' }, ({ url }) => {
-      const match = url.match(/https:\/\/dev\.azure\.com\/([^\/]+)\/([^\/]+)/)
-      if (match) {
-        const [_, org, project] = match
-        const formattedUrl = `https://dev.azure.com/${org}/${project}/_git/${project}?path=${encodeURIComponent(
-          reference.relativePath
-        )}&version=GB${branch}${lineFragment}`
-        return `[Azure DevOps](${formattedUrl})`
+      // Handle HTTPS format: https://dev.azure.com/org/project
+      let httpsMatch = url.match(
+        /https:\/\/dev\.azure\.com\/([^\/]+)\/([^\/]+)/
+      )
+
+      // Handle SSH format: git@ssh.dev.azure.com:v3/org/project/repo
+      let sshMatch = url.match(
+        /git@ssh\.dev\.azure\.com:v3\/([^\/]+)\/([^\/]+)\/([^\/]+)/
+      )
+
+      // Handle legacy visualstudio.com format: https://org.visualstudio.com/project
+      let legacyMatch = url.match(
+        /https:\/\/([^\.]+)\.visualstudio\.com\/([^\/]+)/
+      )
+
+      let org: string, project: string
+
+      if (httpsMatch) {
+        ;[, org, project] = httpsMatch
+      } else if (sshMatch) {
+        ;[, org, project] = sshMatch
+      } else if (legacyMatch) {
+        ;[, org, project] = legacyMatch
+      } else {
+        return undefined
       }
-      return undefined
+
+      const formattedUrl = `https://dev.azure.com/${org}/${project}/_git/${project}?path=${encodeURIComponent(
+        reference.relativePath
+      )}&version=GB${branch}${lineFragment}`
+      return `[Azure DevOps](${formattedUrl})`
     })
     .with({ provider: 'generic' }, ({ url }) => `[source](${url})`)
     .with({ provider: 'unknown' }, () => undefined)
