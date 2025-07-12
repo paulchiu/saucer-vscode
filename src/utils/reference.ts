@@ -6,6 +6,7 @@ import { fromSelection, ReferenceRange } from './referenceRange'
 import { getReferenceType, ReferenceType } from './referenceType'
 import { RemoteInfo } from './git'
 import { toProviderLineFragment } from './line'
+import { buildAzureSourceUrl } from './azure'
 
 export type Reference = {
   type: ReferenceType
@@ -76,16 +77,8 @@ export function toSourceLink(
         `[Bitbucket](${url}/src/${branch}/${reference.relativePath}${lineFragment})`
     )
     .with({ provider: 'azure' }, ({ url }) => {
-      const match = url.match(/https:\/\/dev\.azure\.com\/([^\/]+)\/([^\/]+)/)
-      if (!match) {
-        return undefined
-      }
-
-      const [, org, project] = match
-      const formattedUrl = `https://dev.azure.com/${org}/${project}/_git/${project}?path=${encodeURIComponent(
-        reference.relativePath
-      )}&version=GB${branch}${lineFragment}`
-      return `[Azure DevOps](${formattedUrl})`
+      const formattedUrl = buildAzureSourceUrl(url, branch, reference.relativePath, lineFragment)
+      return formattedUrl ? `[Azure DevOps](${formattedUrl})` : undefined
     })
     .with({ provider: 'generic' }, ({ url }) => `[source](${url})`)
     .with({ provider: 'unknown' }, () => undefined)
