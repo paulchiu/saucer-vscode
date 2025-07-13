@@ -4,7 +4,6 @@ import {
   getCurrentBranch,
   findGitRoot,
   getGitContext,
-  __clearGitRootCache,
   type RemoteInfo,
   type GitContext,
 } from '../../utils/git'
@@ -297,11 +296,6 @@ describe('utils/git', () => {
   describe('findGitRoot', () => {
     const sut = findGitRoot
 
-    beforeEach(() => {
-      // Clear the cache before each test to ensure isolation
-      __clearGitRootCache()
-    })
-
     it('should return git root path when in git repository', async () => {
       mockExecAsync.mockResolvedValueOnce({
         stdout: '/Users/test/project\n',
@@ -335,49 +329,10 @@ describe('utils/git', () => {
 
       expect(result).toBeUndefined()
     })
-
-    it('should cache results for performance', async () => {
-      const cachePath = '/cache/test'
-      mockExecAsync.mockResolvedValueOnce({
-        stdout: '/Users/test/project\n',
-        stderr: '',
-      })
-
-      // First call should execute git command
-      const result1 = await sut(cachePath)
-      expect(result1).toBe('/Users/test/project')
-      expect(mockExecAsync).toHaveBeenCalledTimes(1)
-
-      // Second call should use cached result
-      const result2 = await sut(cachePath)
-      expect(result2).toBe('/Users/test/project')
-      expect(mockExecAsync).toHaveBeenCalledTimes(1) // No additional calls
-    })
-
-    it('should cache failure results to avoid repeated attempts', async () => {
-      const failPath = '/fail/path'
-      mockExecAsync.mockRejectedValueOnce(new Error('fatal: not a git repository'))
-
-      // First call should attempt git command
-      const result1 = await sut(failPath)
-      expect(result1).toBeUndefined()
-      expect(mockExecAsync).toHaveBeenCalledTimes(1)
-
-      // Second call should use cached failure result
-      const result2 = await sut(failPath)
-      expect(result2).toBeUndefined()
-      expect(mockExecAsync).toHaveBeenCalledTimes(1) // No additional calls
-    })
   })
 
   describe('getGitContext', () => {
     const sut = getGitContext
-
-    beforeEach(() => {
-      // Clear cache before each test
-      __clearGitRootCache()
-      vi.resetAllMocks()
-    })
 
     it('should provide git context when in git repository at root level', async () => {
       mockExecAsync.mockResolvedValueOnce({

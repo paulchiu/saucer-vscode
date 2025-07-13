@@ -22,38 +22,19 @@ export type GitContext = {
   relativePath?: string
 }
 
-const gitRootCache = new Map<string, string | undefined>()
-
-// Export cache clearing function for testing
-export function __clearGitRootCache(): void {
-  gitRootCache.clear()
-}
-
 export async function findGitRoot(
   startPath: string
 ): Promise<string | undefined> {
-  // Check cache first
-  const cachedResult = gitRootCache.get(startPath)
-  if (cachedResult !== undefined) {
-    return cachedResult === '' ? undefined : cachedResult
-  }
-
   try {
     const { stdout } = await execAsync('git rev-parse --show-toplevel', {
       cwd: startPath,
     })
 
     const gitRoot = stdout.trim()
-    if (gitRoot) {
-      gitRootCache.set(startPath, gitRoot)
-      return gitRoot
-    }
+    return gitRoot || undefined
   } catch (_error) {
-    // Cache failures to avoid repeated attempts
-    gitRootCache.set(startPath, '')
+    return undefined
   }
-
-  return undefined
 }
 
 export async function getGitContext(
@@ -66,7 +47,6 @@ export async function getGitContext(
     gitRoot,
   }
 
-  // Calculate relative path from git root to workspace if both are available
   if (gitRoot && workspacePath) {
     try {
       const relativePath = path.relative(gitRoot, workspacePath)
