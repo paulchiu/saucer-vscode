@@ -312,7 +312,9 @@ describe('utils/git', () => {
     })
 
     it('should return undefined when not in git repository', async () => {
-      mockExecAsync.mockRejectedValueOnce(new Error('fatal: not a git repository'))
+      mockExecAsync.mockRejectedValueOnce(
+        new Error('fatal: not a git repository')
+      )
 
       const result = await sut('/different/path')
 
@@ -368,7 +370,9 @@ describe('utils/git', () => {
 
     it('should handle workspace outside git repository', async () => {
       const nonGitPath = '/non/git/workspace'
-      mockExecAsync.mockRejectedValueOnce(new Error('fatal: not a git repository'))
+      mockExecAsync.mockRejectedValueOnce(
+        new Error('fatal: not a git repository')
+      )
 
       const result = await sut(nonGitPath)
 
