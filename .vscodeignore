@@ -16,3 +16,7 @@ out/
 src/
 tsconfig.json
 vsc-extension-quickstart.md
+.jj
+.claude
+.github
+coverage
