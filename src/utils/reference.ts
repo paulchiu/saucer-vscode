@@ -44,16 +44,15 @@ export async function getReference(
       gitRoot = gitContext.gitRoot
 
       if (gitRoot) {
-        // Calculate path from git root to the current file
-        const absoluteFilePath = path.resolve(folder?.uri.fsPath || '', relativePath)
+        const absoluteFilePath = path.resolve(
+          folder?.uri.fsPath || '',
+          relativePath
+        )
         pathFromGitRoot = path.relative(gitRoot, absoluteFilePath)
-        
-        // Ensure we use forward slashes for consistency across platforms
         pathFromGitRoot = pathFromGitRoot.replace(/\\/g, '/')
       }
     } catch (_error) {
       // Git operations failed, continue with workspace-relative paths
-      // gitRoot and pathFromGitRoot remain undefined
     }
   }
 
@@ -86,8 +85,6 @@ export function toSourceLink(
   reference: Reference
 ): string | undefined {
   const lineFragment = toProviderLineFragment(remoteInfo, reference)
-  
-  // Use git-relative path when available, otherwise fall back to workspace-relative path
   const referencePath = reference.pathFromGitRoot || reference.relativePath
 
   return match(remoteInfo)
