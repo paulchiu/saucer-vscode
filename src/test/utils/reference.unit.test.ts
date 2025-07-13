@@ -5,6 +5,7 @@ import { getReferenceType, ReferenceType } from '../../utils/referenceType'
 import { fromSelection } from '../../utils/referenceRange'
 import { toProviderLineFragment } from '../../utils/line'
 import { RemoteInfo } from '../../utils/git'
+import { AZURE_LINE_HIGHLIGHT_SNIPPET } from '../../utils/azure'
 
 // Mock dependencies
 vi.mock('../../utils/context', () => ({
@@ -35,6 +36,7 @@ describe('utils/reference', () => {
       linkSource: true,
       cursorRefType: 'Symbol',
       selectionRefType: 'Ask',
+      useGitRoot: false,
     }
 
     it('should return reference with cursor type when range kind is cursor', async () => {
@@ -202,7 +204,7 @@ describe('utils/reference', () => {
       const result = sut(remoteInfo, mockBranch, mockReference)
 
       expect(result).toBe(
-        '[Azure DevOps](https://dev.azure.com/organization/project/_git/project?path=src%2Futils%2Ffile.ts&version=GBmain#L10)'
+        `[Azure DevOps](https://dev.azure.com/organization/project/_git/project?path=src%2Futils%2Ffile.ts&version=GBmain#L10${AZURE_LINE_HIGHLIGHT_SNIPPET})`
       )
     })
 

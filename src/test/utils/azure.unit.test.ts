@@ -1,5 +1,9 @@
 import { describe, it, expect } from 'vitest'
-import { parseAzureUrl, buildAzureSourceUrl } from '../../utils/azure'
+import {
+  parseAzureUrl,
+  buildAzureSourceUrl,
+  AZURE_LINE_HIGHLIGHT_SNIPPET,
+} from '../../utils/azure'
 
 describe('parseAzureUrl', () => {
   const sut = parseAzureUrl
@@ -68,7 +72,7 @@ describe('buildAzureSourceUrl', () => {
     const result = sut(url, branch, relativePath, lineFragment)
 
     expect(result).toBe(
-      'https://dev.azure.com/myorg/myproject/_git/myproject?path=src%2Ffile.ts&version=GBmain#L10'
+      `https://dev.azure.com/myorg/myproject/_git/myproject?path=src%2Ffile.ts&version=GBmain#L10${AZURE_LINE_HIGHLIGHT_SNIPPET}`
     )
   })
 
@@ -81,7 +85,7 @@ describe('buildAzureSourceUrl', () => {
     const result = sut(url, branch, relativePath, lineFragment)
 
     expect(result).toBe(
-      'https://dev.azure.com/myorg/myproject/_git/myproject?path=README.md&version=GBdevelop'
+      `https://dev.azure.com/myorg/myproject/_git/myproject?path=README.md&version=GBdevelop${AZURE_LINE_HIGHLIGHT_SNIPPET}`
     )
   })
 
@@ -94,7 +98,7 @@ describe('buildAzureSourceUrl', () => {
     const result = sut(url, branch, relativePath, lineFragment)
 
     expect(result).toBe(
-      'https://dev.azure.com/myorg/myproject/_git/myproject?path=src%2Fcomponents%2Fmy%20component.tsx&version=GBmain#L5-L10'
+      `https://dev.azure.com/myorg/myproject/_git/myproject?path=src%2Fcomponents%2Fmy%20component.tsx&version=GBmain#L5-L10${AZURE_LINE_HIGHLIGHT_SNIPPET}`
     )
   })
 
@@ -118,7 +122,7 @@ describe('buildAzureSourceUrl', () => {
     const result = sut(url, branch, relativePath, lineFragment)
 
     expect(result).toBe(
-      'https://dev.azure.com/myorg/myproject/_git/myproject?path=docs%2Fapi.md&version=GBfeature/branch#L1'
+      `https://dev.azure.com/myorg/myproject/_git/myproject?path=docs%2Fapi.md&version=GBfeature/branch#L1${AZURE_LINE_HIGHLIGHT_SNIPPET}`
     )
   })
 })
