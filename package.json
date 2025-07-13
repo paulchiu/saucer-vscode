@@ -4,7 +4,7 @@
   "description": "Copy code reference with Git provider source links as Markdown for sharing",
   "repository": "https://github.com/paulchiu/saucer-vscode",
   "publisher": "paulchiu",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "icon": "icon.png",
   "engines": {
     "vscode": "^1.90.0"

@@ -25,7 +25,7 @@ describe('utils/line', () => {
       ${'github'}    | ${42}      | ${'#L42'}
       ${'gitlab'}    | ${42}      | ${'#L42'}
       ${'bitbucket'} | ${42}      | ${'#lines-42'}
-      ${'azure'}     | ${42}      | ${'&line=42&lineEnd=42'}
+      ${'azure'}     | ${42}      | ${'&line=42&lineEnd=43'}
       ${'generic'}   | ${42}      | ${''}
     `(
       'cursor line formatting for $provider',
@@ -48,7 +48,7 @@ describe('utils/line', () => {
       ${'github'}    | ${10}     | ${20}   | ${'#L10-L20'}
       ${'gitlab'}    | ${10}     | ${20}   | ${'#L10-20'}
       ${'bitbucket'} | ${10}     | ${20}   | ${'#lines-10:20'}
-      ${'azure'}     | ${10}     | ${20}   | ${'&line=10&lineEnd=20'}
+      ${'azure'}     | ${10}     | ${20}   | ${'&line=10&lineEnd=21'}
       ${'generic'}   | ${10}     | ${20}   | ${''}
     `(
       'selection line formatting for $provider',

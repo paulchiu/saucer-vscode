@@ -9,7 +9,7 @@ function toProviderCursorLine(provider: GitProvider, line: number): string {
     .with('github', () => `#L${line}`)
     .with('gitlab', () => `#L${line}`)
     .with('bitbucket', () => `#lines-${line}`)
-    .with('azure', () => `&line=${line}&lineEnd=${line}`)
+    .with('azure', () => `&line=${line}&lineEnd=${line + 1}`)
     .with('generic', () => '')
     .exhaustive()
 }
@@ -23,7 +23,7 @@ function toProviderSelectionLines(
     .with('github', () => `#L${startLine}-L${endLine}`)
     .with('gitlab', () => `#L${startLine}-${endLine}`)
     .with('bitbucket', () => `#lines-${startLine}:${endLine}`)
-    .with('azure', () => `&line=${startLine}&lineEnd=${endLine}`)
+    .with('azure', () => `&line=${startLine}&lineEnd=${endLine + 1}`)
     .with('generic', () => '')
     .exhaustive()
 }
