@@ -5,6 +5,11 @@ All notable changes to the "saucer" extension will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.2] - Dependency updates and minimum VS Code version bump
+
+- Bumped minimum supported VS Code version to 1.106.0
+- Updated dev dependencies (TypeScript 6.0, ESLint 10, knip 6, esbuild 0.28, others)
+
 ## [1.3.1] - Fixed line referencing and highlighting for Azure DevOps
 
 - Fixed issue where Azure references would only link to file and not line(s)
