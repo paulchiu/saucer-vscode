@@ -7,11 +7,13 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  checks: read
 
 jobs:
   dependabot-auto-merge:
     runs-on: ubuntu-latest
     if: ${{ github.actor == 'dependabot[bot]' }}
+    timeout-minutes: 20
     steps:
       - name: Dependabot metadata
         id: metadata
@@ -19,10 +21,40 @@ jobs:
         with:
           github-token: '${{ secrets.GITHUB_TOKEN }}'
 
-      - name: Enable auto-merge for minor and patch updates
+      # Polls the check directly rather than using `gh pr merge --auto`. Auto-merge only engages
+      # when a PR cannot merge immediately, so without branch protection it either errors or
+      # degrades to an unguarded merge that races ahead of CI.
+      - name: Wait for CI build check
         if: ${{ steps.metadata.outputs.update-type == 'version-update:semver-minor' || steps.metadata.outputs.update-type == 'version-update:semver-patch' }}
+        id: wait
         run: |
-          gh pr merge --auto --squash "$PR_URL" --body "Auto-merged minor/patch dependency update"
+          SHA="${{ github.event.pull_request.head.sha }}"
+          for i in $(seq 1 60); do
+            result=$(gh api "repos/${{ github.repository }}/commits/$SHA/check-runs" \
+              --jq '.check_runs[] | select(.name=="build") | .status + ":" + (.conclusion // "null")')
+            if [ -n "$result" ]; then
+              status="${result%%:*}"
+              conclusion="${result##*:}"
+              if [ "$status" = "completed" ]; then
+                if [ "$conclusion" = "success" ]; then
+                  echo "passed=true" >> "$GITHUB_OUTPUT"
+                  exit 0
+                fi
+                echo "::error::build check finished with conclusion=$conclusion"
+                exit 1
+              fi
+            fi
+            sleep 15
+          done
+          echo "::error::Timed out waiting for the build check"
+          exit 1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Merge minor/patch update
+        if: ${{ steps.wait.outputs.passed == 'true' }}
+        run: |
+          gh pr merge --squash --delete-branch "$PR_URL" --body "Auto-merged minor/patch dependency update"
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
