@@ -121,5 +121,9 @@
   },
   "dependencies": {
     "ts-pattern": "^5.9.0"
+  },
+  "overrides": {
+    "diff": "^8.0.4",
+    "serialize-javascript": "^7.1.0"
   }
 }
