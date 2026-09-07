@@ -124,6 +124,6 @@
   },
   "overrides": {
     "diff": "^8.0.4",
-    "serialize-javascript": "^7.1.0"
+    "serialize-javascript": "^7.1.1"
   }
 }
