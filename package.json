@@ -120,7 +120,7 @@
     "vitest": "^4.0.14"
   },
   "dependencies": {
-    "ts-pattern": "^5.9.0"
+    "ts-pattern": "^5.9.2"
   },
   "overrides": {
     "diff": "^8.0.4",
