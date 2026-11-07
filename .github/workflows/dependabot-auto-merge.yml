@@ -53,8 +53,13 @@ jobs:
 
       - name: Merge minor/patch update
         if: ${{ steps.wait.outputs.passed == 'true' }}
+        # Retries because the merge API intermittently returns transient GraphQL errors.
         run: |
-          gh pr merge --squash --delete-branch "$PR_URL" --body "Auto-merged minor/patch dependency update"
+          for i in 1 2 3 4 5; do
+            gh pr merge --squash --delete-branch "$PR_URL" --body "Auto-merged minor/patch dependency update" && exit 0
+            sleep $((i * 20))
+          done
+          exit 1
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

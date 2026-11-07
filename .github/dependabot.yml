@@ -14,6 +14,7 @@ updates:
     labels:
       - "dependencies"
       - "automerge"
+    # Majors stay ungrouped so one breaking bump can't block every minor/patch from auto-merging.
     groups:
       dev-dependencies:
         patterns:
@@ -29,13 +30,11 @@ updates:
           - "npm-run-all"
           - "@vscode/*"
         update-types:
-          - "major"
           - "minor"
           - "patch"
       runtime-dependencies:
         patterns:
           - "ts-pattern"
         update-types:
-          - "major"
           - "minor"
           - "patch"

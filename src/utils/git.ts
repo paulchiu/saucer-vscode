@@ -3,11 +3,7 @@ import { execAsync } from './exec'
 import * as path from 'path'
 
 export type GitProvider =
-  | 'github'
-  | 'gitlab'
-  | 'bitbucket'
-  | 'azure'
-  | 'generic'
+  'github' | 'gitlab' | 'bitbucket' | 'azure' | 'generic'
 
 export type RemoteInfo =
   | {
