@@ -154,8 +154,7 @@ export class Position {
   translate(change: { lineDelta?: number; characterDelta?: number }): Position
   translate(
     lineDeltaOrChange?:
-      | number
-      | { lineDelta?: number; characterDelta?: number },
+      number | { lineDelta?: number; characterDelta?: number },
     characterDelta = 0
   ): Position {
     if (lineDeltaOrChange === null || lineDeltaOrChange === undefined) {
